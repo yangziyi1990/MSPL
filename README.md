@@ -1,2 +1,128 @@
-# MSPL
-MSPL: Multimodal Self-Paced Learning for multi-omics feature selection and data integration
+# MSPL: Multimodal Self-Paced Learning for multi-omics feature selection and data integration
+
+This repository provides some codes for this paper. 
+
+The code Version 1.0.
+
+If you find it interesting and confused about the content, please contact me.
+
+communication E-mail: yangziyi091100@163.com
+
+## I . Abstract
+
+Rapid advances in high-throughput sequencing technology have led to the generation of a large number of
+multi-omics biological datasets. Integrating data from different omics provides an unprecedented opportunity to gain insight into disease mechanism from different perspectives. However, integrative analysis and predictive modeling from multi-omics data are facing three major challenges: i) heavy noises; ii) the high dimensions compared to the small samples; iii) data heterogeneity. Current multi-omics data integration approaches have some limitations and are susceptible to heavy noise. In this paper, we present MSPL, a robust supervised multi-omics data integration method that simultaneously identifies significant multi-omics signatures during the integration process and predicts the cancer subtypes. The proposed method not only inherits the generalization performance of self-paced learning, but also
+leverages the properties of multi-omics data containing correlated information to interactively recommend high-confidence samples for model training. We demonstrate the capabilities of MSPL using simulated data and five multi-omics biological datasets, integrating up three omics to identify potential biological signatures, and evaluating the performance compared to state-of-the-art methods in binary and multi-class classification problems. Our proposed model makes multi-omics data integration more systematic and expands its range of applications.
+
+## II. Introduce about code
+
+### i . The repository can be divided into three parts: 
+
+1. Codes for simulated experiments.
+2. Codes for benchmark multi-omics cancer datasets. (binary classification problem)
+3. Codes for breast multi-omics cancer datasets. (multiple classification problem)
+
+### ii . The compared methods:
+
+Current supervised multimodal data integration approaches for predicting cancer subtypes and identifying significant multi-omics signatures can be classified as concatenation-based, ensemble-based, and knowledge-driven approaches.
+
+We applied the logistic regression model/multinomial model with Elastic Net (EN) regularization [1], Random Forest (RF) [2] and Self-paced Learning (SPL) with L1 penalty [3] in the concatenation and ensemble frameworks. The compared methods include: concatenation-based methods (Concate\_EN, Concate\_ RF, and Concate\_SPL), ensemble-based methods (Ensemble\_EN, Ensemble\_RF, and Ensemble\_SPL) and DIABLO [4]. In this paper, we proposed a novel model for multi-omics data integration, termed as MSPL. 
+
+### iii. The MSPL model:
+
+The objective function of MSPL can be expressed as:
+$$
+\mathop{\min}_{\substack{\beta^{\left(j\right)},v^{\left(j\right)}\in\left[0,1\right]^n,\\j=1,2,\ldots,m}}E(\beta^{\left(j\right)},v^{\left(j\right)};\lambda^{(j)},\gamma^{\left(j\right)},\delta)=\sum_{j=1}^{m}\sum_{i=1}^{n}{v_i^{(j)}L\left(y_i,f^{\left(j\right)}\left(x_i^{\left(j\right)},\beta^{\left(j\right)}\right)\right)}+\sum_{j=1}^{m}{\lambda^{(j)}||\beta^{\left(j\right)}||_{1}} \\
+-\sum_{j=1}^{m}\sum_{i=1}^{n}{\gamma^{\left(j\right)}v_i^{(j)}}-\delta\sum_{\substack{1\le k,j\le m,\\k\neq j}}{\left(v^{\left(k\right)}\right)^Tv^{\left(j\right)}},
+$$
+
+## III. Codes for simulated experiments
+
+The codes for simulated experiments contain three parts:
+
+1. Generating simulated data.
+2. Train different data sets using training data sets and get the best solution for each model.
+3. Calculate the prediction and feature selection performance. (We applied five indicators to evaluate the prediction performance: accuracy, sensitivity, specificity, recall, and AUC. To evaluate the feature selection performance, $\beta$-sensitivity and $\beta$-specificity are applied.)
+
+The defined of $\beta$-sensitivity and $\beta$-specificity are as follows:
+$$
+True Positive (TP)= \left|\beta.\ast\hat{\beta}\right|_0,   True Negative (TN)= \left|\bar{\beta}.\ast\bar{\hat{\beta}}\right|_0 \\
+False Positive (FP)= \left|\bar{\beta}.\ast\hat{\beta}\right|_0 ,   False Negative (FN)=\ \left|\beta.\ast\bar{\hat{\beta}}\right|_0 \\
+\beta-sensitivity= \frac{TP}{TP+FN}\\
+\beta-specificity=\ \frac{TN}{TN+FP}
+$$
+where the $|\cdot|_0$ represents the number of non-zero elements in a vector. The logical not operators of  $\beta$ and $\hat{\beta}$ are $\bar{\beta}$ and $\bar{\hat{\beta}}$, respectively. And $.\ast$ is the element-wise product.
+
+***Special comments:***
+
+Since biological samples are complex and cannot be visualized, the choice of model parameters is a challenge. In order to make the model better select the samples in each class in the process of sample selection, we added the parameters of the selected sample size in the process of self-step learning.
+
+## IV. Codes for benchmark multi-omics cancer data sets
+
+Four benchmark multi-omics cancer datasets (mRNA, miRNA and DNA methylation) were obtained from [5]: Glioblastoma multi-forme (GBM), Kidney renal clear cell carcinoma (KRCCC), Lung squamous cell carcinoma (LSCC), Colon adenocarcinoma (COAD). Survival times were provided for each disease cohort by [5]. By using the median survival time, we dichotomized the samples into two classes in low and high survival times. A brief description of these four benchmark datasets is summarized in Table I.
+
+Table I. The measurements of sample sizes and the number of features in each omics for four benchmark cancer datasets.
+
+| Benchmark datasets | Samples (high/low) | mRNA  | miRNA | methylation |
+| :----------------: | :----------------: | :---: | :---: | :---------: |
+|       KRCCC        |    122 (61/61)     | 17665 |  329  |    24960    |
+|        LSCC        |    106 (53/53)     | 12042 |  352  |    23074    |
+|        GBM         |   213 (105/108)    | 12042 |  534  |    1305     |
+|        COAD        |     92 (33/59)     | 17814 |  312  |    23088    |
+
+
+
+The codes for simulated experiments contain three parts:
+
+1. Pre-processing benchmark cancer datasets.
+2. Train different data sets using training data sets and get the best solution for each model.
+3. Calculate the prediction performance. (We applied five indicators to evaluate the prediction performance: accuracy, sensitivity, specificity, recall, and AUC.)
+
+***Special comments:***
+
+For the benchmark cancer data experiment, we evaluate the classifier for the binary classification problem.
+
+Since biological samples are complex and cannot be visualized, the choice of model parameters is a challenge. In order to make the model better select the samples in each class in the process of sample selection, we added the parameters of the selected sample size in the process of self-step learning.
+
+## V. Codes for breast multi-omics cancer data set
+
+We curated breast cancer multi-omics dataset (mRNA, miRNA and methylation) from the Cancer Genome Atlas (TCGA, data version 2015 11 01 for BRCA) in order to achieve a systems characterization of breast cancer subtypes with multiple omics. 
+
+The raw data of breast cancer multi-omics can be download from the website: http://gdac.broadinstitute.org/runs/stddata__2015_11_01/data/BRCA/20151101/.
+
+This dataset contains four subtypes of breast cancer: Luminal A (LumA), Luminal B (LumB), Her2-enriched (Her2) and Basal-like (Basal), which have been reported the most replicated subtypes of human breast cancer. The miRNA dataset was derived from two different Illumina technologies: The Illumina Genome Analyzer and the Illumina Hiseq. The methylation data was derived from two different platforms: the Illumina Methylation 27 and the Illumina 450K.
+
+The codes for simulated experiments contain three parts:
+
+1. Pre-processing breast cancer multi-omics dataset.
+2. Train different data sets using training data sets and get the best solution for each model.
+3. Calculate the prediction performance. (We applied five indicators to evaluate the prediction performance: accuracy, sensitivity, specificity, recall, and AUC.)
+
+***Special comments:***
+
+For the breast cancer multi-omics data experiment, we evaluate the classifier for the multiple classification problem.
+
+Since biological samples are complex and cannot be visualized, the choice of model parameters is a challenge. In order to make the model better select the samples in each class in the process of sample selection, we added the parameters of the selected sample size in the process of self-step learning.
+
+
+
+## VI. Reference:
+
+[1] H. Zou and T. Hastie, “Regularization and variable selection via the elastic net,” Journal of the royal statistical society:  series B (statistical methodology), vol. 67, no. 2, pp. 301–320, 2005.
+
+[2] A. Liaw, M. Wiener et al., “Classification and regression by randomforest,” R news, vol. 2, no. 3, pp. 18–22, 2002.
+
+[3] M. P. Kumar, B. Packer, and D. Koller, “Self-paced learning for latent variable models,” in Advances in Neural Information Processing Systems, 2010, pp. 1189–1197.
+
+[4] A. Singh, C. P. Shannon, B. Gautier, F. Rohart, M. Vacher, S. J. Tebbutt, and K.-A. Lˆe Cao, “Diablo: an integrative approach for identifying key molecular drivers from multi-omics assays,” Bioinformatics, 2019.
+
+[5] B. Wang, A. M. Mezlini, F. Demir, M. Fiume, Z. Tu, M. Brudno, B. Haibe-Kains, and A. Goldenberg, “Similarity network fusion for aggregating data types on a genomic scale,” Nature methods, vol. 11, no. 3, p. 333, 2014.
+
+
+
+
+
+
+
+
+
